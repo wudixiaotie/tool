@@ -1,0 +1,33 @@
+#!/bin/bash
+cd $1
+if [[ "${1}" == "" ]]; then
+    echo "No Project"
+    exit 1
+fi
+
+SSHPORT="22"
+SSHHOST="root@debug"
+B_DEBUG="debug_xiaotie"
+
+B_EXIST="$(git branch | grep ${B_DEBUG} | wc -l)"
+
+if [ ${B_EXIST} -eq 0 ]; then
+    echo "Creating Branch ${B_DEBUG}"
+    git branch ${B_DEBUG}
+fi
+
+git checkout ${B_DEBUG}
+git add -A
+git commit -m "debug"
+git push origin ${B_DEBUG}
+
+# delete remote branch
+# git branch -ｒ
+# git branch -r -d origin/${B_DEBUG}
+# git push origin :${B_DEBUG}
+
+ssh -p $SSHPORT $SSHHOST "cd /root/code/${1}/; \
+git pull origin; \
+git checkout ${B_DEBUG}; \
+cd ..; \
+./${1}Compile"
